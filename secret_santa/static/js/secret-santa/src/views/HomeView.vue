@@ -1,21 +1,32 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
+import type { Ref } from 'vue'
 import { getParticipants, generateDraw as apiGenerateDraw, getDraws} from '../api/participants'
 
-const participants = ref([])
-const draws = ref([])
+type Participant = {
+  name: string
+}
+
+type DrawItem = {
+  name: string,
+  offers_to: string
+}
+
+type Draw = {
+  date: Date,
+  items: Array<DrawItem>
+}
+
+const participants: Ref<Array<Participant>> = ref([])
+const draws: Ref<Array<Draw>> = ref([])
 
 onBeforeMount(async () => { 
   console.log("before mount")
-  const p = await getParticipants()
-  console.debug("p",p)
-  participants.value = p
-  const d = await getDraws()
-  draws.value = d
-  console.debug("d",d)
+  participants.value = await getParticipants()
+  draws.value = await getDraws()
 })
 
-async function generateDraw(event) {
+async function generateDraw() {
   await apiGenerateDraw()
   draws.value = await getDraws()
 }

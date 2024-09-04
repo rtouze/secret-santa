@@ -6,7 +6,14 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <header>
     <h1>Secret santa</h1>
-    <RouterLink to="/create-participant-list">Create a participant list</RouterLink>
+    <ul>
+      <li>
+        <RouterLink to="/">Home</RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/create-participant-list">Create a participant list</RouterLink>
+      </li>
+    </ul>
   </header>
   <RouterView />
 </template>

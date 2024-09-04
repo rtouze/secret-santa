@@ -1,6 +1,6 @@
 const BASE_API_URL = 'http://127.0.0.1:8000'
 
-export async function createParticipants(pSet:Set) {
+export async function createParticipants(pSet:Set<string>) {
   const plist = Array.from(pSet.values())
   try {
   const resp = await fetch(BASE_API_URL + "/api/v1/participants", {
