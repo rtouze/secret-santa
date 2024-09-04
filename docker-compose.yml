@@ -1,0 +1,11 @@
+services: 
+  santadb:
+    image: postgres:16
+    volumes: 
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=ssanta
+      - POSTGRES_USER=ssanta
+      - POSTGRES_PASSWORD=secret
+    ports: 
+      - "7777:5432"
