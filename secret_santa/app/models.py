@@ -5,7 +5,7 @@ class Participant(models.Model):
     name = models.CharField(max_length=30, unique=True)
 
 class ParticipantBlacklistItem(models.Model):
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="participant")
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="blacklisted")
     blacklisted_participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="blacklisted_participant")
 
 class Draw(models.Model):

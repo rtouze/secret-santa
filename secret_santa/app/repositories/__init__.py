@@ -34,9 +34,13 @@ class SantaRepository:
 
     def save_participant_list(self, participants):
         DbParticipant.objects.all().delete()
+        DbDraw.objects.all().delete()
         for p in participants:
             dbp = DbParticipant(name=p.name)
             dbp.save()
 
     def get_participant_list(self):
-        return [Participant(p.name) for p in DbParticipant.objects.all()]
+        return [
+            Participant(p.name, [bi.name for bi in p.blacklisted.all()])
+            for p in DbParticipant.objects.all()
+        ]
