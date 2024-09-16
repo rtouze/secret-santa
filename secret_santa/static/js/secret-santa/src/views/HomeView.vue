@@ -2,6 +2,7 @@
 import { onBeforeMount, ref } from 'vue'
 import type { Ref } from 'vue'
 import { getParticipants, generateDraw as apiGenerateDraw, getDraws} from '../api/participants'
+import Participant from '../components/Participant.vue'
 
 type Participant = {
   name: string
@@ -36,9 +37,8 @@ async function generateDraw() {
   <main>
     <h2>Participant list</h2>
     <div v-if="participants.length">
-      <div v-for="p in participants">
-        {{p.name}}
-      </div>
+      <Participant v-for="p in participants" :participant="p">
+      </Participant>
       <button @click="generateDraw">Generate draw</button>
     </div>
     <div v-else>No participant at the moment</div>

@@ -38,3 +38,15 @@ def test_create_draw_using_blacklist():
     draw = create_draw(l)
     assert draw.items[0].name == "john"
     assert draw.items[0].offers_to == "bar"
+
+
+def test_sort_list_to_put_participant_with_longest_list_first():
+    l = [
+        Participant("jane"),
+        Participant("john", ["jane", "foo"]),
+        Participant("foo"),
+        Participant("bar"),
+    ]
+    draw = create_draw(l)
+    assert draw.items[0].name == "john"
+    assert draw.items[0].offers_to == "bar"

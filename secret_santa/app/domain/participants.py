@@ -18,10 +18,7 @@ class Draw:
         self.date = date
 
     def as_dict(self):
-        return {
-                "date": self.date,
-                "items": [ i.as_dict() for i in self.items ]
-                }
+        return {"date": self.date, "items": [i.as_dict() for i in self.items]}
 
 
 class DrawItem:
@@ -40,18 +37,27 @@ class DrawItem:
 
 
 def create_draw(participants: list):
+    """This function generates a random draw using a participant list.
+
+    The participant list is sorted to put the one with the longest blacklist at first.
+
+    The first giver is used as the last receiver.
+
+    """
     items = []
     recipients = set()
 
+    sorted_participants = sorted(participants, key=lambda p: len(p.blacklist), reverse=True)
+
     n = 0
-    g = participants[0]
+    g = sorted_participants[0]
     recipients = []
     while True:
-        if n == len(participants) - 1:
-            items.append(DrawItem(g.name, participants[0].name))
+        if n == len(sorted_participants) - 1:
+            items.append(DrawItem(g.name, sorted_participants[0].name))
             break
 
-        r = find_recipient(g, participants, recipients)
+        r = find_recipient(g, sorted_participants, recipients)
         items.append(DrawItem(g.name, r.name))
         recipients.append(r.name)
         g = r
@@ -72,7 +78,9 @@ def find_recipient(giver, participants, recipients):
     ]
     return random.choice(candidates)
 
+
 # Use cases
+
 
 class GenerateAndSaveDraw:
     def __init__(self, repository):
@@ -83,25 +91,46 @@ class GenerateAndSaveDraw:
         draw = create_draw(participants)
         self.repo.save_draw(draw)
 
+
 class UpdateParticipantList:
-    def __init__(self,repository):
+    def __init__(self, repository):
         self.repo = repository
 
     def execute(self, participant_list):
         plist = [Participant(p.strip()) for p in participant_list if p.strip()]
         self.repo.save_participant_list(plist)
 
+
 class GetParticipantList:
-    def __init__(self,repository):
+    def __init__(self, repository):
         self.repo = repository
 
     def execute(self):
-        participants = self.repo.get_participant_list() # DbParticipant.objects.all()
-        return [ {"name": p.name } for p in participants]
+        participants = self.repo.get_participant_list()  # DbParticipant.objects.all()
+        return [{"name": p.name, "blacklist": p.blacklist} for p in participants]
+
 
 class GetDrawList:
     def __init__(self, repository):
         self.repo = repository
 
     def execute(self):
-        return [ d.as_dict() for d in self.repo.get_draws() ]
+        return [d.as_dict() for d in self.repo.get_draws()]
+
+
+class UpdateParticipantBlacklist:
+    def __init__(self, repository):
+        self.repo = repository
+
+    def execute(self, name, blacklist):
+        p_names = {p.name for p in self.repo.get_participant_list()}
+        participant = Participant(
+            name.strip(),
+            [
+                b.strip()
+                for b in blacklist
+                if b.strip() and b.strip() != name and b.strip() in p_names
+            ],
+        )
+        self.repo.save_participant(participant)
+        return participant.blacklist

@@ -43,3 +43,15 @@ export async function getDraws() {
   const data = await resp.json()
   return data.data
 }
+
+export async function updateParticipantBlacklist(participantName:string, blacklist:Array<string>) {
+  const resp = await fetch(BASE_API_URL + `/api/v1/participants?name=${participantName}`, {
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({'blacklist': blacklist}) 
+  })
+  const data = await resp.json()
+  return data.data
+}

@@ -4,16 +4,13 @@ import type { Ref } from 'vue'
 import { createParticipants } from '../api/participants'
 // const props = defineProps([''])
 
+const listCreated = ref(false)
 const participantList = defineModel({ type: String })
-const pSet: Ref<Array<string>> = ref([])
 
 async function createList() {
-  console.log('createList clicked')
-  console.log(participantList)
   const participantSet:Set<string> = new Set(participantList.value?.split('\n'))
-  console.log(participantSet)
-  pSet.value = Array.from(participantSet.values())
-  createParticipants(participantSet)
+  await createParticipants(participantSet)
+  listCreated.value = true
 }
 
 </script>
@@ -21,10 +18,15 @@ async function createList() {
   <main>
     <label for="p-list">Paste your participant list, one line per participant</label>
     <textarea v-model="participantList" id="p-list" name="" cols="30" rows="10" placeholder="participants..."></textarea>
-    <pre>
-    content
-    {{pSet}}
-    </pre>
-    <button @click="createList">Create</button>
+    <button class="create-btn" @click="createList">Create</button>
+    <p v-if="listCreated">
+    Participant list created. You can go back to the <RouterLink to="/">home page</RouterLink>.
+    </p>
   </main>
 </template>
+
+<style scoped>
+  .create-btn {
+    display: block;
+  }
+</style>

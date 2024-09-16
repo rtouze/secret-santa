@@ -4,8 +4,15 @@ from app.models import (
     Participant as DbParticipant,
     Draw as DbDraw,
     DrawItem as DbDrawItem,
+    ParticipantBlacklistItem,
 )
 from app.domain.participants import Participant, Draw, DrawItem
+from django.db import transaction
+
+
+class ParticipantNotFoundError(Exception):
+    def __init__(self, name):
+        super().__init__(f"Participant {name} not found")
 
 
 class SantaRepository:
@@ -41,6 +48,23 @@ class SantaRepository:
 
     def get_participant_list(self):
         return [
-            Participant(p.name, [bi.name for bi in p.blacklisted.all()])
+            Participant(p.name, [bi.blacklisted_participant.name for bi in p.blacklisted.all()])
             for p in DbParticipant.objects.all()
         ]
+
+    def save_participant(self, participant):
+        with transaction.atomic():
+            db_participants_by_name = {p.name: p for p in DbParticipant.objects.all()}
+
+            db_participant = db_participants_by_name.get(participant.name)
+            if not participant:
+                raise ParticipantNotFoundError(participant.name)
+
+            db_participant.blacklisted.all().delete()
+            for blacklist_item in participant.blacklist:
+                blacklisted_participant = db_participants_by_name.get(blacklist_item)
+                if blacklisted_participant:
+                    ParticipantBlacklistItem(
+                        participant=db_participant,
+                        blacklisted_participant=blacklisted_participant,
+                    ).save()

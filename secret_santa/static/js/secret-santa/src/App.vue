@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
   <header>
-    <h1>Secret santa</h1>
+    <h1>Secret Santa</h1>
     <ul>
       <li>
         <RouterLink to="/">Home</RouterLink>

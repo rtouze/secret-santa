@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.functions import Now
 
+
 class Participant(models.Model):
     name = models.CharField(max_length=30, unique=True)
 

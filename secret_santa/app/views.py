@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from app.repositories import SantaRepository
-from app.domain.participants import GenerateAndSaveDraw, UpdateParticipantList, GetParticipantList, GetDrawList
+from app.domain.participants import GenerateAndSaveDraw, UpdateParticipantList, GetParticipantList, GetDrawList, UpdateParticipantBlacklist
 import json
 
 def base(request):
@@ -16,6 +16,17 @@ def participants(request):
         return HttpResponse(b"OK")
     if request.method == "GET":
         return JsonResponse({"data": GetParticipantList(SantaRepository()).execute()})
+    if request.method == "PUT":
+        qs = request.GET
+        name = qs.get("name")
+
+        if not name:
+            return HttpResponse(b"Missing name", status_code=400)
+
+
+        data = json.loads(request.body)
+        new_blacklist = UpdateParticipantBlacklist(SantaRepository()).execute(name, data['blacklist'])
+        return JsonResponse({"data": new_blacklist})
 
 
 @csrf_exempt
